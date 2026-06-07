@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026.7.8.1 (lcoppenr fork)
+
+> Fork of upstream [heytcass/home-assistant-addons](https://github.com/heytcass/home-assistant-addons) **v2.4.0**, rebased 2026-07-08.
+> Adds the optional SSH server from [PR #92](https://github.com/heytcass/home-assistant-addons/pull/92) by [@heman22union](https://github.com/heman22union), with additional sshd hardening. Upstream PR #92 remains unmerged; this fork carries the feature until it lands.
+
+### ✨ Fork Feature: Optional SSH Server
+- Connect via SSH from VS Code Remote, a Mac/Linux terminal, or any SSH client
+- `enable_ssh` (default `false`), `ssh_port` (default `2222`), `ssh_authorized_keys` list
+- Host keys persisted in `$ANTHROPIC_HOME/ssh/` — no client warnings after restarts
+- `ssh ... -t "tmux attach -t claude"` attaches to the running Claude session
+
+### 🔒 Security Hardening (beyond PR #92)
+- `PermitRootLogin prohibit-password` (PR had `yes`)
+- `KbdInteractiveAuthentication no`, `UsePAM no` — no PAM challenge-response path
+- `X11Forwarding no`, `MaxAuthTries 3`, `LoginGraceTime 30`
+- Explicit `chmod 600` on host key private files
+- Warning logged when SSH is enabled with no authorized keys
+
+### 📦 Fork Notes
+- CalVer (`YYYY.M.D.iteration`) to avoid collisions with upstream's semver
+- Everything below is upstream's changelog, unchanged
+
+---
+
 ## 2.4.0
 
 ### ✨ ha-mcp 3.5.1 → 7.11.0 (four major versions)

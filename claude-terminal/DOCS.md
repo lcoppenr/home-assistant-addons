@@ -27,6 +27,9 @@ Your credentials are stored under `/data` and persist across restarts and add-on
 | `ha_smart_context` | `true` | Generate a CLAUDE.md with your HA system info so Claude knows your setup. |
 | `enable_ha_mcp` | `true` | Register the [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) MCP server so Claude can control Home Assistant directly. |
 | `ha_mcp_version` | `"7.11.0"` | ha-mcp release to run. 32-bit ARM ignores this and stays on 3.5.1 (no Python 3.13 builds for that platform). |
+| `enable_ssh` | `false` | *(fork)* Start a hardened SSH server for remote access (VS Code Remote, terminal clients). Pubkey-only. |
+| `ssh_port` | `2222` | *(fork)* SSH server port. Also map this port in the add-on's **Network** settings. |
+| `ssh_authorized_keys` | `[]` | *(fork)* SSH public keys allowed to log in. Password auth is disabled. |
 | `persistent_apk_packages` | `[]` | APK packages reinstalled on every startup. |
 | `persistent_pip_packages` | `[]` | Python packages reinstalled on every startup. |
 
@@ -67,6 +70,36 @@ The bundled [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) server connects
 ha-mcp requires Python 3.13, which Alpine doesn't ship — the add-on provisions a managed Python build via [uv](https://github.com/astral-sh/uv) into `/data` on first use (a one-time ~150–250 MB download that persists across restarts and is included in HA backups). The environment is pre-warmed in the background at startup so the first MCP connection is fast.
 
 Disable it with `enable_ha_mcp: false` if you don't want Claude to have this access.
+
+## SSH Server (fork feature)
+
+This fork adds an optional SSH server so you can reach the add-on container directly from VS Code Remote, a Mac/Linux terminal, or any SSH client — without going through the web terminal. It is disabled by default.
+
+### Setup
+
+1. Enable it in the add-on configuration:
+   ```yaml
+   enable_ssh: true
+   ssh_port: 2222
+   ssh_authorized_keys:
+     - "ssh-ed25519 AAAA... you@machine"
+   ```
+2. Map port `2222` in the add-on's **Network** settings
+3. Restart the add-on
+
+### Connecting
+
+```bash
+ssh root@<ha-ip> -p 2222                               # shell
+ssh root@<ha-ip> -p 2222 -t "tmux attach -t claude"    # attach to the Claude session
+```
+
+### Security
+
+- **Public-key authentication only** — password and keyboard-interactive auth are disabled
+- **Hardened sshd**: `PermitRootLogin prohibit-password`, `UsePAM no`, `X11Forwarding no`, `MaxAuthTries 3`, `LoginGraceTime 30`
+- **Persistent host keys** in `$ANTHROPIC_HOME/ssh/` so your client won't warn about changed keys after a restart
+- If SSH is enabled with no authorized keys, a warning is logged and no one can log in — add your key with `cat ~/.ssh/id_ed25519.pub`
 
 ## Security notes
 
