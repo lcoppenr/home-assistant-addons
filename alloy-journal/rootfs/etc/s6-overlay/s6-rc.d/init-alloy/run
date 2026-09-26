@@ -72,7 +72,6 @@ loki.source.journal "journal" {
   relabel_rules = loki.relabel.journal.rules
   labels        = {
     host = "@HOST_LABEL@",
-    job  = "systemd-journal",
   }
 }
 
@@ -136,6 +135,20 @@ loki.process "journal" {
   // Drop blank lines.
   stage.drop {
     expression = "^\\s*$"
+  }
+
+  // Strip terminal colour codes (HA Core colours its log lines).
+  stage.replace {
+    expression = "(\\x1b\\[[0-9;]*m)"
+    replace    = ""
+  }
+
+  // Set here: loki.source.journal overwrites a job label given in its
+  // labels block with its own component name.
+  stage.static_labels {
+    values = {
+      job = "systemd-journal",
+    }
   }
 
   forward_to = [loki.write.loki.receiver]

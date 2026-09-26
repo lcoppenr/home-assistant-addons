@@ -1,7 +1,7 @@
 ---
 name: "Alloy Journal to Loki"
 description: "Ship the Home Assistant OS journal (Core, Supervisor, add-ons, host) to Loki with Grafana Alloy"
-version: "1.0.0"
+version: "1.0.1"
 slug: "alloy_journal"
 init: false
 

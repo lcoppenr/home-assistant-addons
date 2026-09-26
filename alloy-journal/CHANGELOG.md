@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- `job` is now `systemd-journal` as documented (the journal source was
+  overwriting it with its component name).
+- Strip terminal colour codes from log lines (HA Core colours its output).
+
 ## 1.0.0
 
 - First release. Grafana Alloy v1.19.2 reads the HAOS systemd journal and
