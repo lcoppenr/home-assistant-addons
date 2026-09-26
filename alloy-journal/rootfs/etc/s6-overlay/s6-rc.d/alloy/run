@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+# Long-running Alloy service; reads the config rendered by init-alloy.
+# --disable-reporting: no anonymous usage reports to stats.grafana.org.
+# The HTTP server listens inside the container only (no host port is mapped).
+exec /usr/bin/alloy run \
+    --disable-reporting \
+    --server.http.listen-addr=127.0.0.1:12345 \
+    --storage.path=/data/alloy \
+    /etc/alloy/config.alloy

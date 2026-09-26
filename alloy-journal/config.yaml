@@ -1,0 +1,30 @@
+---
+name: "Alloy Journal to Loki"
+description: "Ship the Home Assistant OS journal (Core, Supervisor, add-ons, host) to Loki with Grafana Alloy"
+version: "1.0.0"
+slug: "alloy_journal"
+init: false
+
+arch:
+  - aarch64
+  - amd64
+
+url: "https://github.com/lcoppenr/home-assistant-addons/tree/main/alloy-journal"
+
+# Read access to the host systemd journal (mounted by the Supervisor).
+journald: true
+
+startup: services
+boot: auto
+
+options:
+  loki_url: "http://10.0.1.15:3100/loki/api/v1/push"
+  host_label: "homeassistant"
+  log_level: "info"
+  exclude_syslog_identifiers: []
+schema:
+  loki_url: url
+  host_label: str
+  log_level: "list(debug|info|warn|error)"
+  exclude_syslog_identifiers:
+    - str
